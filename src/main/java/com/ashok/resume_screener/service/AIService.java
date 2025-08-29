@@ -10,12 +10,9 @@ import java.util.Map;
 @Service
 public class AIService {
 
-    @Value("${api.token}")
-    private String token;
-
     private final WebClient webClient;
 
-    public AIService() {
+    public AIService(@Value("${api.token}") String token) {
         this.webClient = WebClient.builder()
                 .baseUrl("https://router.huggingface.co/v1/chat/completions")
                 .defaultHeader("Authorization", "Bearer " + token)

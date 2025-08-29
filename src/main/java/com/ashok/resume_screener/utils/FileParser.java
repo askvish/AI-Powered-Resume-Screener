@@ -7,6 +7,7 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.Normalizer;
 
 public class FileParser {
 
@@ -18,7 +19,21 @@ public class FileParser {
 
         if (fileName.endsWith(".pdf")) {
             try (PDDocument document = PDDocument.load(file)) {
-                return new PDFTextStripper().getText(document);
+                String rawText = new PDFTextStripper().getText(document);
+
+                // 1. Normalize Unicode (fix ligatures, accents, etc.)
+                String normalized = Normalizer.normalize(rawText, Normalizer.Form.NFKC);
+
+                // 2. Remove control/non-printable characters EXCEPT newline (\n)
+                String cleaned = normalized.replaceAll("[\\p{C}&&[^\\n]]", " ");
+
+                // 3. Clean up spaces (but keep line breaks)
+                cleaned = cleaned.replaceAll("[ \\t\\x0B\\f\\r]+", " ");
+
+                // 4. Trim leading/trailing spaces on each line (optional)
+                cleaned = cleaned.replaceAll("(?m)^\\s+|\\s+$", "");
+
+                return cleaned.trim();
             }
         } else if (fileName.endsWith(".docx")) {
             try (FileInputStream fis = new FileInputStream(file);
