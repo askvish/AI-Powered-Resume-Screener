@@ -1,5 +1,6 @@
 package com.ashok.resume_screener.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -9,12 +10,15 @@ import java.util.Map;
 @Service
 public class AIService {
 
+    @Value("${api.token}")
+    private String token;
+
     private final WebClient webClient;
 
     public AIService() {
         this.webClient = WebClient.builder()
                 .baseUrl("https://router.huggingface.co/v1/chat/completions")
-                .defaultHeader("Authorization", "Bearer xyz")
+                .defaultHeader("Authorization", "Bearer " + token)
                 .defaultHeader("Content-Type", "application/json")
                 .build();
     }

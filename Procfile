@@ -1,2 +1,1 @@
-public class Procfile {
-}
+web: java -jar target/resume_screener-1.0.jar
